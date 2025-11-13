@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Y-Diet Habitome Smart Swap | Tea/Coffee Personalizer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --bg-soft: #e5f3ff;
+      --card: #ffffff;
+      --accent: #16a34a;
+      --accent-soft: rgba(22,163,74,0.08);
+      --accent-alt: #0ea5e9;
+      --ink: #0f172a;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --radius-xl: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 14px 40px rgba(15,23,42,0.08);
+      --font: system-ui, -apple-system, BlinkMacSystemFont, -system-ui, sans-serif;
+      --transition: 0.22s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app-wrap {
+      max-width: 1240px;
+      margin: 20px auto 32px;
+      padding: 0 16px;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    header .title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    header .title span.sub {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    header .badge-wrap {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 260px minmax(0,1fr);
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 860px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .sidebar {
+      background: var(--card);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      padding: 14px 12px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      position: sticky;
+      top: 10px;
+    }
+
+    .sidebar-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .nav-btn {
+      border: none;
+      width: 100%;
+      text-align: left;
+      padding: 8px 9px;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .nav-btn span.label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn span.step {
+      width: 16px;
+      height: 16px;
+      border-radius: 6px;
+      background: var(--bg-soft);
+      font-size: 0.62rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .nav-btn.active {
+      background: var(--accent);
+      color: #ecfdf3;
+      box-shadow: 0 8px 18px rgba(22,163,74,0.35);
+    }
+
+    .nav-btn.active span.step {
+      background: rgba(15,23,42,0.96);
+      color: #ecfdf3;
+    }
+
+    .nav-btn:hover:not(.active) {
+      background: var(--accent-soft);
+      color: var(--ink);
+    }
+
+    .nav-caption {
+      margin-top: 6px;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .status-card {
+      margin-top: 8px;
+      padding: 8px;
+      border-radius: 12px;
+      background: #f9fafb;
+      border: 1px solid var(--line);
+      font-size: 0.7rem;
+      display: grid;
+      gap: 2px;
+    }
+
+    .status-label {
+      color: var(--muted);
+    }
+
+    .status-value {
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .content {
+      background: var(--card);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      padding: 14px 14px 16px;
+      min-height: 420px;
+    }
+
+    .view {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(4px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    h2.section-title {
+      font-size: 1.02rem;
+      margin: 0 0 2px;
+    }
+
+    p.section-sub {
+      margin: 0 0 10px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+      gap: 10px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-bottom: 6px;
+    }
+
+    .field label {
+      font-size: 0.74rem;
+      color: var(--muted);
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--line);
+      padding: 6px 7px;
+      font-size: 0.78rem;
+      outline: none;
+      transition: var(--transition);
+      font-family: inherit;
+      background: #f9fafb;
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--accent);
+      background: #ffffff;
+      box-shadow: 0 0 0 1px rgba(22,163,74,0.08);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin: 4px 0 2px;
+    }
+
+    .pill {
+      padding: 3px 7px;
+      font-size: 0.68rem;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      cursor: pointer;
+      transition: var(--transition);
+      background: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .pill input {
+      margin: 0;
+    }
+
+    .pill.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+
+    .btn {
+      border-radius: 999px;
+      padding: 6px 11px;
+      font-size: 0.78rem;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: var(--transition);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #ecfdf3;
+      box-shadow: 0 6px 16px rgba(22,163,74,0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(22,163,74,0.4);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+    }
+
+    .btn-ghost:hover {
+      background: #ecfdf3;
+      color: var(--accent);
+    }
+
+    .btn-soft {
+      background: #f9fafb;
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+
+    .btn-soft:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(190px,1fr));
+      gap: 8px;
+      margin: 6px 0;
+    }
+
+    .summary-card {
+      border-radius: 14px;
+      padding: 7px 8px;
+      background: #f9fafb;
+      border: 1px solid var(--line);
+      font-size: 0.7rem;
+      display: grid;
+      gap: 2px;
+    }
+
+    .summary-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .summary-value {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .summary-note {
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    .pill-small {
+      font-size: 0.6rem;
+      padding: 2px 5px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: inline-block;
+      margin-right: 3px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.7rem;
+      margin-top: 4px;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 4px 5px;
+      text-align: center;
+    }
+
+    th {
+      background: #f9fafb;
+      font-weight: 600;
+    }
+
+    td.habit-label {
+      text-align: left;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .tracker-cell {
+      cursor: pointer;
+      transition: var(--transition);
+      background: #ffffff;
+    }
+
+    .tracker-cell.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+      }
+      .sidebar {
+        display: none;
+      }
+      .content {
+        box-shadow: none;
+        border-radius: 0;
+      }
+      .btn-row {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-wrap">
+  <header>
+    <div class="title">
+      <div>Y-Diet Habitome Smart Swap</div>
+      <span class="sub">
+        Tea/Coffee Personalizer · For people with 4–6× cup patterns who want gentle “de-addiction”
+      </span>
+    </div>
+    <div class="badge-wrap">
+      <div class="badge"><span class="dot"></span> Habitome · RBY · Smart Swap</div>
+      <div class="badge"><span class="dot"></span> Tea/Coffee Focused</div>
+      <div class="badge"><span class="dot"></span> 14–28 Day Mini-Experiment</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-title">Flow</div>
+      <button class="nav-btn active" data-view="overview">
+        <span class="label"><span class="step">0</span> Overview</span>
+        <span>›</span>
+      </button>
+      <button class="nav-btn" data-view="profile">
+        <span class="label"><span class="step">1</span> Profile & Goals</span>
+        <span>›</span>
+      </button>
+      <button class="nav-btn" data-view="pattern">
+        <span class="label"><span class="step">2</span> Tea/Coffee Pattern</span>
+        <span>›</span>
+      </button>
+      <button class="nav-btn" data-view="loops">
+        <span class="label"><span class="step">3</span> Habitome Loops</span>
+        <span>›</span>
+      </button>
+      <button class="nav-btn" data-view="plan">
+        <span class="label"><span class="step">4</span> Smart Swap Plan</span>
+        <span>›</span>
+      </button>
+      <button class="nav-btn" data-view="tracker">
+        <span class="label"><span class="step">5</span> 14-Day Tracker</span>
+        <span>›</span>
+      </button>
+      <button class="nav-btn" data-view="summary">
+        <span class="label"><span class="step">6</span> Summary & Export</span>
+        <span>›</span>
+      </button>
+
+      <div class="nav-caption">
+        Use this SPA during consultation to map tea/coffee habitome → design 3–5 Smart Swaps → track 14 days.
+        Not a medical app; this is a lifestyle experiment.
+      </div>
+
+      <div class="status-card">
+        <div class="status-label">Client:</div>
+        <div class="status-value" id="statusClient">Not set</div>
+        <div class="status-label">Pattern:</div>
+        <div class="status-value" id="statusPattern">–</div>
+        <div class="status-label">Focus:</div>
+        <div class="status-value" id="statusFocus">–</div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <section class="view active" id="view-overview">
+        <h2 class="section-title">Welcome to the Y-Diet Tea/Coffee Habitome Personalizer</h2>
+        <p class="section-sub">
+          This tool is for people who feel “I can’t function without tea/coffee” and want to
+          reduce dependence gently – without sudden shock, guilt or extreme dieting.
+        </p>
+
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-title">What this app does</div>
+            <div class="summary-value">Maps → Swaps → Tracks</div>
+            <div class="summary-note">
+              It maps your 24-hr tea/coffee habitome, identifies Rogi loops and gives 3–5 Smart Swaps with
+              Y-Diet–friendly options and DIY ideas.
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-title">Who it is for</div>
+            <div class="summary-value">4–6 cups/day users</div>
+            <div class="summary-note">
+              Especially those with acidity, poor sleep, palpitations or energy crashes linked to tea/coffee cycles.
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-title">How it works</div>
+            <div class="summary-value">14–28 day experiment</div>
+            <div class="summary-note">
+              We agree on a small reduction target, earlier cut-off time, and swaps like herbal drinks / Y-Diet mixes,
+              then track adherence – not perfection.
+            </div>
+          </div>
+        </div>
+
+        <p class="section-sub">
+          Start with <span class="pill-small">Profile & Goals</span> to personalise this planner for your client.
+        </p>
+        <div class="btn-row">
+          <button class="btn btn-primary" data-view-jump="profile">Start with Client Profile →</button>
+        </div>
+      </section>
+
+      <section class="view" id="view-profile">
+        <h2 class="section-title">Step 1 · Client Profile & Goals</h2>
+        <p class="section-sub">
+          Capture just enough detail to personalise the habitome plan. This is not a medical history – focus on lifestyle.
+        </p>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>Client Name</label>
+            <input id="clientName" type="text" placeholder="e.g., Priya S." />
+          </div>
+          <div class="field">
+            <label>Age</label>
+            <input id="clientAge" type="number" min="16" max="80" placeholder="e.g., 35" />
+          </div>
+          <div class="field">
+            <label>Role / Context</label>
+            <select id="clientRole">
+              <option value="">Select</option>
+              <option>Employed Professional</option>
+              <option>Entrepreneur / Business Owner</option>
+              <option>Homemaker</option>
+              <option>Student</option>
+              <option>Retired</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Main Drink Pattern</label>
+            <select id="mainDrink">
+              <option value="">Select</option>
+              <option>Mostly Tea</option>
+              <option>Mostly Coffee</option>
+              <option>Tea & Coffee equally</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Top 2 goals for this 14–28 day experiment</label>
+          <textarea id="goalText" placeholder="e.g., Reduce from 6 cups → 3 cups; sleep before 11 pm; reduce acidity & bloating."></textarea>
+        </div>
+
+        <div class="field">
+          <label>Key symptoms related to tea/coffee (optional)</label>
+          <textarea id="symptomText" placeholder="e.g., burning in chest, shakiness, headache if I miss my tea, late sleep..."></textarea>
+        </div>
+
+        <p class="section-sub">
+          You can explain: “We are not removing tea/coffee totally. First we are changing pattern, timing and swaps.”
+        </p>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" data-view-jump="overview">← Back</button>
+          <button class="btn btn-primary" id="btnSaveProfile">Save & go to Tea/Coffee Pattern →</button>
+        </div>
+      </section>
+
+      <section class="view" id="view-pattern">
+        <h2 class="section-title">Step 2 · Tea/Coffee Habitome Pattern</h2>
+        <p class="section-sub">
+          Map the quantity, timing and triggers. The app will estimate a simple Habitome risk score (0–10) and band.
+        </p>
+
+        <div class="grid-2">
+          <div>
+            <div class="field">
+              <label>On a usual weekday, how many cups?</label>
+              <input id="cupsWeekday" type="number" min="0" max="15" placeholder="e.g., 5" />
+            </div>
+            <div class="field">
+              <label>On a usual weekend / holiday, how many cups?</label>
+              <input id="cupsWeekend" type="number" min="0" max="15" placeholder="e.g., 4" />
+            </div>
+            <div class="field">
+              <label>Sugar per cup (tsp)</label>
+              <input id="sugarPerCup" type="number" min="0" max="6" step="0.5" placeholder="e.g., 2" />
+            </div>
+            <div class="field">
+              <label>Style of drink</label>
+              <select id="milkType">
+                <option value="">Select</option>
+                <option>Strong milk tea / filter coffee</option>
+                <option>Black tea / black coffee</option>
+                <option>Latte / Cappuccino / Milk based</option>
+                <option>Other / Herbal</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <div class="field">
+              <label>First cup timing</label>
+              <input id="firstCupTime" type="time" placeholder="e.g., 6:30 AM" />
+            </div>
+            <div class="field">
+              <label>Last cup timing (Cut-off)</label>
+              <input id="lastCupTime" type="time" placeholder="e.g., 3:00 PM" />
+            </div>
+            <div class="field">
+              <label>Main Triggers for a cup (select 2–3)</label>
+              <div class="pill-row" id="triggerPills">
+                <div class="pill" data-trigger="WakeUp">First thing after waking up</div>
+                <div class="pill" data-trigger="WorkStart">Starting work / Focus</div>
+                <div class="pill" data-trigger="PostMeal">Immediately after meal</div>
+                <div class="pill" data-trigger="BreakTime">Break / Gossip time</div>
+                <div class="pill" data-trigger="EveningCrash">Evening energy crash</div>
+                <div class="pill" data-trigger="Headache">Need to avoid headache</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card" style="margin-top:10px;">
+          <div class="summary-title">Estimated Habitome Risk Band</div>
+          <div class="summary-value" id="riskScore">N/A</div>
+          <div class="summary-note" id="riskBand">
+            Risk is estimated based on cups, sugar, and cut-off time. Low (0-3), Medium (4-6), High (7-10).
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" data-view-jump="profile">← Back</button>
+          <button class="btn btn-primary" id="btnSavePattern">Save & go to Habitome Loops →</button>
+        </div>
+      </section>
+
+      <section class="view" id="view-loops">
+        <h2 class="section-title">Step 3 · Habitome Loops (Cue, Craving, Response, Reward)</h2>
+        <p class="section-sub">
+          Identify the 3 most important loops to target for Smart Swaps. Use the pattern data from Step 2 to guide.
+        </p>
+
+        <div class="field">
+          <label>Targeted Loop 1: The Morning Kickstart</label>
+          <textarea placeholder="e.g., Cue: Waking up → Craving: Energy/Alertness → Response: 1st cup of tea/coffee → Reward: Feeling 'functional'"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Targeted Loop 2: The Afternoon Slump</label>
+          <textarea placeholder="e.g., Cue: Post-lunch heaviness / email fatigue → Craving: Focus/Sugar hit → Response: 3rd cup of tea/coffee (strong) → Reward: Powering through work"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Targeted Loop 3: The Evening Habit</label>
+          <textarea placeholder="e.g., Cue: Finish work / Watch TV → Craving: Relaxation / Taste → Response: Last cup of milk tea → Reward: Comfort, social interaction"></textarea>
+        </div>
+
+        <p class="section-sub">
+          Focus: **Map the feeling or thought** that drives the 'craving' most strongly.
+        </p>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" data-view-jump="pattern">← Back</button>
+          <button class="btn btn-primary" data-view-jump="plan">Go to Smart Swap Plan →</button>
+        </div>
+      </section>
+
+      <section class="view" id="view-plan">
+        <h2 class="section-title">Step 4 · Smart Swap Plan (3 x Response Replacement)</h2>
+        <p class="section-sub">
+          Design 3 low-effort, high-impact **Smart Swaps** to replace the 'Response' in the targeted loops.
+        </p>
+
+        <div class="field">
+          <label>Smart Swap 1 (Morning Loop)</label>
+          <input type="text" placeholder="e.g., Replace 1st cup with Y-Diet Detox / Lemon Ginger Tea" />
+        </div>
+
+        <div class="field">
+          <label>Smart Swap 2 (Afternoon Loop)</label>
+          <input type="text" placeholder="e.g., Replace 3rd cup with a 5-min walk and a glass of buttermilk" />
+        </div>
+
+        <div class="field">
+          <label>Smart Swap 3 (Evening Loop)</label>
+          <input type="text" placeholder="e.g., Replace Last cup with warm turmeric milk (golden latte) and a book" />
+        </div>
+
+        <div class="field">
+          <label>Agreed Daily Target (Cups/Day)</label>
+          <input id="dailyTarget" type="number" min="0" max="10" placeholder="e.g., 3 cups" />
+        </div>
+
+        <div class="field">
+          <label>Agreed Daily Cut-off Time</label>
+          <input id="cutoffTarget" type="time" placeholder="e.g., 2:00 PM" />
+        </div>
+
+        <p class="section-sub">
+          Commit to track these 3 swaps and the target adherence for the next 14 days.
+        </p>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" data-view-jump="loops">← Back</button>
+          <button class="btn btn-primary" data-view-jump="tracker">Start 14-Day Tracker →</button>
+        </div>
+      </section>
+
+      <section class="view" id="view-tracker">
+        <h2 class="section-title">Step 5 · 14-Day Tracker</h2>
+        <p class="section-sub">
+          Track the 3 Smart Swaps daily. Click a cell to mark it as **Adhered** (Green).
+        </p>
+
+        <table id="trackerTable">
+          <thead>
+            <tr>
+              <th>Habit</th>
+              <th>D1</th><th>D2</th><th>D3</th><th>D4</th><th>D5</th><th>D6</th><th>D7</th>
+              <th>D8</th><th>D9</th><th>D10</th><th>D11</th><th>D12</th><th>D13</th><th>D14</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="habit-label">Target Cups Adherence</td>
+              <td class="tracker-cell" data-habit="target" data-day="1"></td>
+              <td class="tracker-cell" data-habit="target" data-day="2"></td>
+              <td class="tracker-cell" data-habit="target" data-day="3"></td>
+              <td class="tracker-cell" data-habit="target" data-day="4"></td>
+              <td class="tracker-cell" data-habit="target" data-day="5"></td>
+              <td class="tracker-cell" data-habit="target" data-day="6"></td>
+              <td class="tracker-cell" data-habit="target" data-day="7"></td>
+              <td class="tracker-cell" data-habit="target" data-day="8"></td>
+              <td class="tracker-cell" data-habit="target" data-day="9"></td>
+              <td class="tracker-cell" data-habit="target" data-day="10"></td>
+              <td class="tracker-cell" data-habit="target" data-day="11"></td>
+              <td class="tracker-cell" data-habit="target" data-day="12"></td>
+              <td class="tracker-cell" data-habit="target" data-day="13"></td>
+              <td class="tracker-cell" data-habit="target" data-day="14"></td>
+            </tr>
+            <tr>
+              <td class="habit-label">Swap 1: Morning</td>
+              <td class="tracker-cell" data-habit="swap1" data-day="1"></td>
+              <td class="tracker-cell" data-habit="swap1" data-day="2"></td>
+              <td class="tracker-cell" data-habit="swap1" data-day="3"></td>
+              <td class="tracker-cell" data-habit="swap1" data-day="4"></td>
+              <td class="tracker-cell" data-habit="swap1" data-day="5"></td>
+              <td class="tracker-cell" data-habit="swap1" data-day="6"></td>
+              <td class="tracker-cell" data-habit="swap1" data-day="7"></td>
+              <td class="tracker-cell" data-habit="swap1" data-day="8"></td>
+              <td class="tracker-cell" data-habit="swap1" data-day="9"></td>
+              <td class="tracker-cell" data-habit="swap1" data-day="10"></td>
+              <td class="tracker-cell" data-habit="swap1" data-day="11"></td>
+              <td class="tracker-cell" data-habit="swap1" data-day="12"></td>
+              <td class="tracker-cell" data-habit="swap1" data-day="13"></td>
+              <td class="tracker-cell" data-habit="swap1" data-day="14"></td>
+            </tr>
+            <tr>
+              <td class="habit-label">Swap 2: Afternoon</td>
+              <td class="tracker-cell" data-habit="swap2" data-day="1"></td>
+              <td class="tracker-cell" data-habit="swap2" data-day="2"></td>
+              <td class="tracker-cell" data-habit="swap2" data-day="3"></td>
+              <td class="tracker-cell" data-habit="swap2" data-day="4"></td>
+              <td class="tracker-cell" data-habit="swap2" data-day="5"></td>
+              <td class="tracker-cell" data-habit="swap2" data-day="6"></td>
+              <td class="tracker-cell" data-habit="swap2" data-day="7"></td>
+              <td class="tracker-cell" data-habit="swap2" data-day="8"></td>
+              <td class="tracker-cell" data-habit="swap2" data-day="9"></td>
+              <td class="tracker-cell" data-habit="swap2" data-day="10"></td>
+              <td class="tracker-cell" data-habit="swap2" data-day="11"></td>
+              <td class="tracker-cell" data-habit="swap2" data-day="12"></td>
+              <td class="tracker-cell" data-habit="swap2" data-day="13"></td>
+              <td class="tracker-cell" data-habit="swap2" data-day="14"></td>
+            </tr>
+            <tr>
+              <td class="habit-label">Swap 3: Evening</td>
+              <td class="tracker-cell" data-habit="swap3" data-day="1"></td>
+              <td class="tracker-cell" data-habit="swap3" data-day="2"></td>
+              <td class="tracker-cell" data-habit="swap3" data-day="3"></td>
+              <td class="tracker-cell" data-habit="swap3" data-day="4"></td>
+              <td class="tracker-cell" data-habit="swap3" data-day="5"></td>
+              <td class="tracker-cell" data-habit="swap3" data-day="6"></td>
+              <td class="tracker-cell" data-habit="swap3" data-day="7"></td>
+              <td class="tracker-cell" data-habit="swap3" data-day="8"></td>
+              <td class="tracker-cell" data-habit="swap3" data-day="9"></td>
+              <td class="tracker-cell" data-habit="swap3" data-day="10"></td>
+              <td class="tracker-cell" data-habit="swap3" data-day="11"></td>
+              <td class="tracker-cell" data-habit="swap3" data-day="12"></td>
+              <td class="tracker-cell" data-habit="swap3" data-day="13"></td>
+              <td class="tracker-cell" data-habit="swap3" data-day="14"></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p class="section-sub">
+          Adherence Score: <span id="adherenceScore">0%</span> (Check this on Day 7 and Day 14)
+        </p>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" data-view-jump="plan">← Back</button>
+          <button class="btn btn-primary" data-view-jump="summary">Go to Summary & Export →</button>
+        </div>
+      </section>
+
+      <section class="view" id="view-summary">
+        <h2 class="section-title">Step 6 · Summary & Export</h2>
+        <p class="section-sub">
+          Review the complete plan and results. Click 'Export' to create a printable/PDF summary.
+        </p>
+
+        <div class="summary-card" style="margin-bottom:10px;">
+          <div class="summary-title">Client: <span id="summaryClientName">Not set</span> | Goal: <span id="summaryGoal">Not set</span></div>
+          <div class="summary-value">Start Pattern: <span id="summaryStartPattern">N/A</span> cups | Target: <span id="summaryTargetPattern">N/A</span> cups</div>
+          <div class="summary-note">Total Adherence: <span id="summaryAdherence">N/A</span>%</div>
+        </div>
+
+        <h3>Smart Swap Plan</h3>
+        <ul style="font-size:0.8rem; padding-left:20px;">
+          <li>Swap 1: <span id="summarySwap1">N/A</span></li>
+          <li>Swap 2: <span id="summarySwap2">N/A</span></li>
+          <li>Swap 3: <span id="summarySwap3">N/A</span></li>
+        </ul>
+
+        <h3>14-Day Tracker Results</h3>
+        <table id="resultsTable" style="margin-bottom: 10px;">
+          </table>
+
+        <p class="section-sub">
+          **Next Step:** Discuss the 14-day adherence, adjust the target if needed, and plan the next 14–28 days.
+        </p>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" data-view-jump="tracker">← Back</button>
+          <button class="btn btn-soft" onclick="window.print()">Print / Export as PDF 🖨️</button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+  // --- Data Store (Simulated) ---
+  const state = {
+    profile: { clientName: "Not set", goalText: "N/A", mainDrink: "N/A" },
+    pattern: { cupsWeekday: 0, firstCupTime: "N/A" },
+    plan: { dailyTarget: 0, cutoffTarget: "N/A", swap1: "N/A", swap2: "N/A", swap3: "N/A" },
+    tracker: {}, // Stores adherence: { target: {1: true, 2: false, ...}, swap1: {...} }
+  };
+
+  // --- View Management Functions ---
+  const navigateToView = (viewId) => {
+    document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+    document.getElementById(`view-${viewId}`).classList.add('active');
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      if (btn.dataset.view === viewId) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    updateStatusCard();
+    if (viewId === 'summary') {
+      populateSummary();
+    }
+  };
+
+  const updateStatusCard = () => {
+    document.getElementById('statusClient').textContent = state.profile.clientName || 'Not set';
+    document.getElementById('statusPattern').textContent = state.pattern.cupsWeekday ? `${state.pattern.cupsWeekday} cups` : '–';
+    document.getElementById('statusFocus').textContent = state.plan.dailyTarget ? `${state.plan.dailyTarget} (Target)` : '–';
+  };
+
+  // --- Event Handlers ---
+  document.querySelectorAll('.nav-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      navigateToView(button.dataset.view);
+    });
+  });
+
+  document.querySelectorAll('[data-view-jump]').forEach(button => {
+    button.addEventListener('click', () => {
+      navigateToView(button.dataset.viewJump);
+    });
+  });
+
+  // Step 1: Profile Save
+  document.getElementById('btnSaveProfile').addEventListener('click', () => {
+    state.profile.clientName = document.getElementById('clientName').value || 'New Client';
+    state.profile.goalText = document.getElementById('goalText').value || 'Not set';
+    state.profile.mainDrink = document.getElementById('mainDrink').value || 'Tea/Coffee';
+    navigateToView('pattern');
+  });
+
+  // Step 2: Pattern Save
+  document.getElementById('btnSavePattern').addEventListener('click', () => {
+    state.pattern.cupsWeekday = parseInt(document.getElementById('cupsWeekday').value) || 0;
+    state.pattern.firstCupTime = document.getElementById('firstCupTime').value || 'N/A';
+
+    // Basic Risk Calculation
+    const risk = (state.pattern.cupsWeekday * 0.5) + (parseInt(document.getElementById('sugarPerCup').value) * 1) + 
+                 ((state.pattern.firstCupTime < "07:00") ? 1 : 0); // Bonus point if first cup is before 7 am
+    document.getElementById('riskScore').textContent = risk.toFixed(1);
+    document.getElementById('riskBand').textContent = `Risk: ${risk <= 3 ? 'Low' : risk <= 6 ? 'Medium' : 'High'}. Adjust cut-off/cups/sugar.`;
+    
+    navigateToView('loops');
+  });
+
+  // Step 2: Trigger Pills Toggle
+  document.getElementById('triggerPills').addEventListener('click', (e) => {
+    if (e.target.classList.contains('pill')) {
+      e.target.classList.toggle('active');
+    }
+  });
+
+  // Step 4: Plan Save
+  document.querySelector('[data-view-jump="tracker"]').addEventListener('click', () => {
+    state.plan.dailyTarget = parseInt(document.getElementById('dailyTarget').value) || 0;
+    state.plan.cutoffTarget = document.getElementById('cutoffTarget').value || 'N/A';
+    state.plan.swap1 = document.querySelector('#view-plan .field:nth-child(1) input').value || 'N/A';
+    state.plan.swap2 = document.querySelector('#view-plan .field:nth-child(2) input').value || 'N/A';
+    state.plan.swap3 = document.querySelector('#view-plan .field:nth-child(3) input').value || 'N/A';
+    navigateToView('tracker');
+  });
+
+  // Step 5: Tracker Toggle
+  document.getElementById('trackerTable').addEventListener('click', (e) => {
+    if (e.target.classList.contains('tracker-cell')) {
+      e.target.classList.toggle('active');
+      const habit = e.target.dataset.habit;
+      const day = e.target.dataset.day;
+      
+      if (!state.tracker[habit]) state.tracker[habit] = {};
+      state.tracker[habit][day] = e.target.classList.contains('active');
+
+      calculateAdherence();
+    }
+  });
+
+  const calculateAdherence = () => {
+    let totalCells = 0;
+    let adheredCells = 0;
+    for (const habit in state.tracker) {
+      for (const day in state.tracker[habit]) {
+        totalCells++;
+        if (state.tracker[habit][day]) {
+          adheredCells++;
+        }
+      }
+    }
+    const adherence = totalCells > 0 ? (adheredCells / totalCells * 100).toFixed(0) : 0;
+    document.getElementById('adherenceScore').textContent = `${adherence}%`;
+  };
+
+
+  // Step 6: Summary Population
+  const populateSummary = () => {
+    document.getElementById('summaryClientName').textContent = state.profile.clientName;
+    document.getElementById('summaryGoal').textContent = state.profile.goalText.substring(0, 50) + (state.profile.goalText.length > 50 ? '...' : '');
+    document.getElementById('summaryStartPattern').textContent = state.pattern.cupsWeekday;
+    document.getElementById('summaryTargetPattern').textContent = state.plan.dailyTarget;
+    document.getElementById('summaryAdherence').textContent = document.getElementById('adherenceScore').textContent;
+    document.getElementById('summarySwap1').textContent = state.plan.swap1;
+    document.getElementById('summarySwap2').textContent = state.plan.swap2;
+    document.getElementById('summarySwap3').textContent = state.plan.swap3;
+    
+    // Copy tracker data for display
+    const trackerBody = document.getElementById('trackerTable').querySelector('tbody').innerHTML;
+    const resultsTable = document.getElementById('resultsTable');
+    resultsTable.innerHTML = `<thead>${document.getElementById('trackerTable').querySelector('thead').innerHTML}</thead><tbody>${trackerBody}</tbody>`;
+  };
+
+  // Initial load
+  document.addEventListener('DOMContentLoaded', () => {
+    navigateToView('overview');
+  });
+
+</script>
+</body>
+</html>

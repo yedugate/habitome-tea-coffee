@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Priya's Custom Health Report | Y-Diet Habitome</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    /* === I. BASE & GLOBAL STYLES ======================================= */
+    :root {
+      --bg: #f5f7fb;
+      --bg-soft: #edf2f7;
+      --card: #ffffff;
+      --accent: #16a34a;
+      --accent-soft: rgba(22, 163, 74, 0.08);
+      --accent-alt: #0ea5e9;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --radius-lg: 18px;
+      --radius-md: 10px;
+      --shadow-soft: 0 10px 28px rgba(15, 23, 42, 0.10);
+      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --risk: #dc2626;
+      --risk-soft: #fef2f2;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font);
+      background:
+        radial-gradient(circle at 5% 0%, rgba(56, 189, 248, 0.12), transparent 55%),
+        radial-gradient(circle at 100% 0%, rgba(45, 212, 191, 0.10), transparent 55%),
+        radial-gradient(circle at 0% 100%, rgba(34, 197, 94, 0.10), transparent 45%),
+        linear-gradient(135deg, #f9fafb, #f3f4f6);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* === II. HEADER ===================================================== */
+    header {
+      padding: 14px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(14px);
+      background:
+        linear-gradient(120deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.96));
+      border-bottom: 1px solid rgba(203, 213, 225, 0.9);
+    }
+
+    .header-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      background:
+        conic-gradient(from 160deg, #16a34a, #0ea5e9, #a855f7, #16a34a);
+      padding: 2px;
+      box-shadow: 0 0 0 2px rgba(209, 213, 219, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-logo-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 30% 10%, #bbf7d0, #16a34a);
+      color: white;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: 0.06em;
+    }
+
+    .brand-title {
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      font-size: 17px;
+      text-transform: uppercase;
+      color: #0f172a;
+    }
+
+    .brand-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .header-tag {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #166534;
+      font-size: 12px;
+      border: 1px solid rgba(22, 163, 74, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .header-tag span {
+      display: inline-flex;
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      background: #ecfdf3;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+    }
+
+    /* === III. LAYOUT ==================================================== */
+    main {
+      flex: 1;
+      padding: 22px 20px 30px;
+    }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto 40px;
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.1fr);
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: sticky;
+      top: 82px;
+    }
+
+    /* === IV. CARDS & TYPOGRAPHY ======================================== */
+    .card {
+      background:
+        radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.12), transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(22, 163, 74, 0.10), transparent 55%),
+        var(--card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 18px 18px 20px;
+      border: 1px solid #e5e7eb;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(148, 163, 184, 0.15), transparent 55%);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card + .card {
+      margin-top: 14px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #0f172a;
+    }
+
+    .card-title span {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: #ecfdf3;
+      box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.3);
+      color: #15803d;
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .badge-soft {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-soft::before {
+      content: "●";
+      font-size: 8px;
+      color: var(--accent);
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* === V. FORM ELEMENTS ============================================== */
+    .grid-2 {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @media (max-width: 700px) {
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .field label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #4b5563;
+    }
+
+    .field small {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    input[type="time"],
+    textarea,
+    select {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 8px 10px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      background: #ffffff;
+      color: var(--text);
+      transition: border 0.15s, box-shadow 0.15s, background 0.15s, transform 0.12s;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #9ca3af;
+      font-size: 12px;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+      background: #f9fafb;
+      box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.3);
+      transform: translateY(-1px);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    .checkbox-group,
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 4px 9px;
+      border: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--muted);
+      background: #f9fafb;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background 0.15s, border 0.15s, transform 0.12s, box-shadow 0.15s;
+    }
+
+    .pill input {
+      accent-color: var(--accent);
+      margin: 0;
+    }
+
+    .pill span {
+      font-size: 11px;
+    }
+
+    .pill:hover {
+      border-color: #cbd5f5;
+      transform: translateY(-1px);
+      background: #f3f4ff;
+    }
+
+    .pill input:checked + span,
+    .pill input:checked ~ span {
+      color: #111827;
+      font-weight: 600;
+    }
+
+    .slider-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .slider-value {
+      font-size: 12px;
+      min-width: 24px;
+      text-align: right;
+      color: var(--muted);
+    }
+
+    /* === VI. TABLES ===================================================== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 12px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      border: 1px solid #e5e7eb;
+      padding: 6px 8px;
+      vertical-align: top;
+      background: #ffffff;
+    }
+
+    th {
+      background: linear-gradient(135deg, #e0f2fe, #dcfce7);
+      font-weight: 600;
+      font-size: 11px;
+      color: #1f2937;
+    }
+
+    td input,
+    td textarea,
+    td select {
+      font-size: 11px;
+      padding: 5px 6px;
+      border-radius: 6px;
+      background: #ffffff;
+    }
+
+    /* === VII. BUTTONS =================================================== */
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+      transition:
+        transform 0.12s ease,
+        box-shadow 0.12s ease,
+        background 0.12s ease,
+        border 0.12s ease;
+    }
+
+    button:active {
+      transform: translateY(1px);
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      color: #ffffff;
+      box-shadow: 0 8px 20px rgba(22, 163, 74, 0.35);
+      border: 1px solid rgba(22, 163, 74, 0.6);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 10px 24px rgba(22, 163, 74, 0.45);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      color: #111827;
+      border: 1px solid #d1d5db;
+      box-shadow: 0 4px 12px rgba(148, 163, 184, 0.25);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent-alt);
+      box-shadow: 0 6px 18px rgba(148, 163, 184, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn-info {
+      background: #e0edff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      box-shadow: 0 6px 18px rgba(59, 130, 246, 0.25);
+    }
+
+    .btn-info:hover {
+      box-shadow: 0 8px 22px rgba(59, 130, 246, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn-soft {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 3px 10px rgba(148, 163, 184, 0.2);
+      font-size: 12px;
+    }
+
+    .btn-soft:hover {
+      border-color: var(--accent-alt);
+      transform: translateY(-1px);
+      background: #e5f0ff;
+    }
+
+    .btn-icon {
+      font-size: 14px;
+    }
+
+    /* === VIII. PREVIEW SIDEBAR ======================================== */
+    .preview-area {
+      background: #f9fafb;
+      color: #111827;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+      max-height: 380px;
+      overflow: auto;
+      border: 1px solid #e5e7eb;
+    }
+
+    .preview-area::-webkit-scrollbar {
+      width: 6px;
+    }
+    .preview-area::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 999px;
+    }
+
+    /* === IX. REPORT PAGE (PRINTABLE) ================================== */
+    #reportPage {
+      display: none;
+    }
+
+    .report-page-container {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 32px 30px 28px;
+      background:
+        radial-gradient(circle at 0 0, rgba(34, 197, 94, 0.12), transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.12), transparent 60%),
+        #ffffff;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid #e5e7eb;
+    }
+
+    .report-header {
+      text-align: center;
+      margin-bottom: 26px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #bbf7d0;
+    }
+
+    .report-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .report-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .report-section {
+      margin-bottom: 26px;
+      padding-top: 12px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 12px;
+      padding: 4px 0;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      padding: 10px 11px;
+      border-radius: var(--radius-md);
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .stat-value {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 4px;
+    }
+
+    .highlight-box {
+      background: var(--risk-soft);
+      border: 1px solid var(--risk);
+      padding: 12px;
+      border-radius: var(--radius-md);
+      margin-bottom: 18px;
+      color: #b91c1c;
+      font-weight: 500;
+      font-size: 12px;
+    }
+
+    .highlight-box strong {
+      font-size: 13px;
+    }
+
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .report-table th,
+    .report-table td {
+      border: 1px solid #e5e7eb;
+      padding: 8px 9px;
+      text-align: left;
+      background: #ffffff;
+    }
+
+    .report-table th {
+      background: linear-gradient(135deg, #e0f2fe, #dcfce7);
+      color: #111827;
+    }
+
+    .report-table tr:nth-child(even) td {
+      background: #f9fafb;
+    }
+
+    /* === X. FOOTER ===================================================== */
+    footer {
+      max-width: 1080px;
+      margin: 0 auto 18px;
+      padding: 0 20px;
+      font-size: 11px;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    /* === XI. PRINT MODE ================================================ */
+    @media print {
+      body {
+        background: #ffffff;
+        color: #000000;
+      }
+      header,
+      .sidebar,
+      .btn-row,
+      footer,
+      #formContainer {
+        display: none !important;
+      }
+      main {
+        padding: 0 !important;
+      }
+      #reportPage {
+        display: block !important;
+      }
+      .report-page-container {
+        box-shadow: none;
+        border-radius: 0;
+        border: none;
+        background: #ffffff;
+        color: #000000;
+      }
+      .report-header,
+      .report-section {
+        border-color: #e5e7eb;
+      }
+      .report-title {
+        color: #111827;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-logo">
+          <div class="brand-logo-inner">Y</div>
+        </div>
+        <div>
+          <div class="brand-title" id="headerTitle">Priya's Y-Diet Habitome Consult</div>
+          <div class="brand-sub">Ahara · AVAVS · Habitome · Smart Swaps</div>
+        </div>
+      </div>
+      <div class="header-tag">
+        <span>★</span>
+        Case: 5× Tea / Coffee Habit
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- === FORM VIEW =================================================== -->
+    <div id="formContainer" class="container">
+      <form id="consultForm">
+        <!-- A. Snapshot -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title"><span>A</span> Client Snapshot</div>
+              <div class="card-subtitle">Who is this consultation for? (Pre-filled for Priya S.)</div>
+            </div>
+            <div class="badge-soft">Step 1 / 4</div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="clientName">Name</label>
+              <input id="clientName" type="text" placeholder="Priya S." />
+            </div>
+            <div class="field">
+              <label for="clientAge">Age</label>
+              <input id="clientAge" type="number" min="0" max="120" placeholder="35" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="clientRole">Role</label>
+              <select id="clientRole">
+                <option value="">Select...</option>
+                <option>Entrepreneur / Business Owner</option>
+                <option>Employed Professional</option>
+                <option>Homemaker</option>
+                <option>Student</option>
+                <option>Retired</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="clientEmail">Contact Email (optional)</label>
+              <input id="clientEmail" type="email" placeholder="name@example.com" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Top Goals (max 2 focus areas)</label>
+            <div class="pill-group">
+              <label class="pill">
+                <input type="checkbox" name="goal" value="Energy & Focus" />
+                <span>Energy & Focus</span>
+              </label>
+              <label class="pill">
+                <input type="checkbox" name="goal" value="Weight Management" />
+                <span>Weight</span>
+              </label>
+              <label class="pill">
+                <input type="checkbox" name="goal" value="Sleep Quality" />
+                <span>Sleep</span>
+              </label>
+              <label class="pill">
+                <input type="checkbox" name="goal" value="Digestive Comfort" />
+                <span>Digestion</span>
+              </label>
+              <label class="pill">
+                <input type="checkbox" name="goal" value="Sugar / Lipids Support" />
+                <span>Sugar / Lipids</span>
+              </label>
+              <label class="pill">
+                <input type="checkbox" name="goal" value="Children's Food Habits" />
+                <span>Kids’ Habits</span>
+              </label>
+            </div>
+            <small>Use this to decide the ONE main outcome of the session.</small>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label>Medical Flags (yes / on medication)</label>
+              <div class="checkbox-group">
+                <label class="pill">
+                  <input type="checkbox" name="flag" value="Diabetes / Pre-diabetes" />
+                  <span>Diabetes</span>
+                </label>
+                <label class="pill">
+                  <input type="checkbox" name="flag" value="High BP" />
+                  <span>High BP</span>
+                </label>
+                <label class="pill">
+                  <input type="checkbox" name="flag" value="Thyroid Issues" />
+                  <span>Thyroid</span>
+                </label>
+                <label class="pill">
+                  <input type="checkbox" name="flag" value="Gut / Acidity / IBS" />
+                  <span>Gut Issues</span>
+                </label>
+                <label class="pill">
+                  <input type="checkbox" name="flag" value="On Long-term Medication" />
+                  <span>Other Meds</span>
+                </label>
+              </div>
+            </div>
+            <div class="field">
+              <label for="medicalNotes">Medical Notes (doctor diagnosis only)</label>
+              <textarea id="medicalNotes" placeholder="e.g. Chronic acidity (on antacids occasionally)..."></textarea>
+            </div>
+          </div>
+
+          <div class="grid-3">
+            <div class="field">
+              <label>Energy – Morning (1 = Low, 10 = High)</label>
+              <div class="slider-row">
+                <input id="energyMorning" type="range" min="1" max="10" value="5" />
+                <div class="slider-value" data-for="energyMorning">5</div>
+              </div>
+            </div>
+            <div class="field">
+              <label>Energy – After Lunch (1 = Low, 10 = High)</label>
+              <div class="slider-row">
+                <input id="energyNoon" type="range" min="1" max="10" value="5" />
+                <div class="slider-value" data-for="energyNoon">5</div>
+              </div>
+            </div>
+            <div class="field">
+              <label>Sleep Quality (1 = Poor, 10 = Great)</label>
+              <div class="slider-row">
+                <input id="sleepQuality" type="range" min="1" max="10" value="5" />
+                <div class="slider-value" data-for="sleepQuality">5</div>
+              </div>
+            </div>
+          </div>
+          <p class="hint">These 1–10 scores become your baseline to show improvement later.</p>
+        </section>
+
+        <!-- B. 24h Ahara Map -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title"><span>B</span> 24h Ahara + AVAVS Map</div>
+              <div class="card-subtitle">Map “yesterday” from wake to sleep (pre-filled for the 5× habit).</div>
+            </div>
+            <div class="badge-soft">Step 2 / 4</div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Idam (Place)</th>
+                <th>Ahara (Food / Drink)</th>
+                <th>Vihara (Activity)</th>
+                <th>Vichara (Feeling)</th>
+                <th>Notes / Red Zone?</th>
+              </tr>
+            </thead>
+            <tbody id="aharaBody"></tbody>
+          </table>
+          <div class="btn-row">
+            <button type="button" class="btn-soft" id="addAharaRowBtn">
+              <span class="btn-icon">＋</span> Add Row
+            </button>
+          </div>
+          <p class="hint">Mark heavy/late meals, skipped meals, tea-biscuit loops, night snacking as “RED ZONE”.</p>
+        </section>
+
+        <!-- C. Habitome Loops -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title"><span>C</span> Habitome Loops (Rogi · Bhogi · Yogi)</div>
+              <div class="card-subtitle">Cue → Routine → Reward mapping (pre-filled for Priya’s loops).</div>
+            </div>
+            <div class="badge-soft">Step 3 / 4</div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Cue / Q-Dot</th>
+                <th>Routine (Behaviour)</th>
+                <th>Reward (Feeling / Result)</th>
+                <th>Tag</th>
+              </tr>
+            </thead>
+            <tbody id="loopsBody"></tbody>
+          </table>
+          <div class="btn-row">
+            <button type="button" class="btn-soft" id="addLoopBtn">
+              <span class="btn-icon">＋</span> Add Loop
+            </button>
+          </div>
+          <p class="hint">Have at least 2 Rogi (problem) loops and 1 Yogi (positive) loop.</p>
+        </section>
+
+        <!-- D. Smart Swaps -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title"><span>D</span> Smart Swap Prescription</div>
+              <div class="card-subtitle">3–5 realistic swaps with confidence scores (pre-filled for Priya).</div>
+            </div>
+            <div class="badge-soft">Step 4 / 4</div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Domain</th>
+                <th>Old Habit</th>
+                <th>New Smart Swap</th>
+                <th>Why (short)</th>
+                <th>Confidence (0–10)</th>
+              </tr>
+            </thead>
+            <tbody id="swapsBody"></tbody>
+          </table>
+          <div class="btn-row">
+            <button type="button" class="btn-soft" id="addSwapBtn">
+              <span class="btn-icon">＋</span> Add Smart Swap
+            </button>
+          </div>
+
+          <div class="grid-2" style="margin-top: 10px;">
+            <div class="field">
+              <label for="trackingDuration">Tracking Duration</label>
+              <select id="trackingDuration">
+                <option value="7 days">7 days</option>
+                <option value="14 days" selected>14 days</option>
+                <option value="21 days">21 days</option>
+                <option value="30 days">30 days</option>
+              </select>
+              <small>Length of Priya’s “mini-experiment”.</small>
+            </div>
+            <div class="field">
+              <label>Metrics (1–2 only)</label>
+              <input id="metric1" type="text" placeholder="Energy at 4 pm (1–10)" />
+              <input id="metric2" type="text" placeholder="Days without chips / packaged snacks" style="margin-top:4px;" />
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="button" class="btn-outline" id="resetFormBtn">Reset to Priya Case</button>
+            <button type="button" class="btn-info" id="viewReportBtn">
+              <span class="btn-icon">📄</span> View Final Report
+            </button>
+            <button type="button" class="btn-primary" id="generateSummaryBtn">
+              <span class="btn-icon">★</span> Generate JSON Summary
+            </button>
+          </div>
+        </section>
+      </form>
+
+      <!-- === SIDEBAR ==================================================== -->
+      <aside class="sidebar">
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title"><span>✔</span> JSON Summary</div>
+              <div class="card-subtitle">Copy to Notion / EMR / Email.</div>
+            </div>
+          </div>
+          <div class="preview-area" id="previewArea">
+            <!-- Click “Generate JSON Summary” to see structured output here. -->
+          </div>
+          <button type="button" class="btn-outline" id="copySummaryBtn" style="margin-top:10px;width:100%;justify-content:center;">
+            <span class="btn-icon">📋</span> Copy Summary
+          </button>
+          <p class="hint">
+            JSON = data export for systems. Use “View Final Report” for Priya’s clean, printable deliverable.
+          </p>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title"><span>ℹ</span> Y-Diet Consult Notes</div>
+            </div>
+          </div>
+          <ul style="margin:0;padding-left:18px;font-size:11px;color:var(--muted);line-height:1.6;">
+            <li>Session outcome: pick ONE main goal (e.g., “Energy till evening”).</li>
+            <li>Focus on 3–5 Smart Swaps only – tiny, realistic, culture-fit.</li>
+            <li>If confidence &lt; 7/10, simplify or shrink the swap.</li>
+            <li>Always add disclaimer: habit coaching ≠ medical advice.</li>
+          </ul>
+        </section>
+      </aside>
+    </div>
+
+    <!-- === REPORT VIEW ================================================= -->
+    <div id="reportPage">
+      <div class="report-page-container">
+        <!-- Filled dynamically -->
+      </div>
+      <div class="btn-row" style="max-width: 820px; margin: 20px auto 0;">
+        <button type="button" class="btn-outline" id="backToFormBtn">
+          <span class="btn-icon">←</span> Back to Form
+        </button>
+        <button type="button" class="btn-primary" id="downloadPdfBtn">
+          <span class="btn-icon">↓</span> Download / Print to PDF
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Y-Diet Habitome · AVAVS · Smart Swaps — designed for Karur / TN & global indoor lifestyles.
+  </footer>
+</div>
+
+<script>
+  // === Priya's Case Study Data ==========================================
+  const PRIYA_DATA = {
+    snapshot: {
+      clientName: "Priya S.",
+      clientAge: 35,
+      clientRole: "Employed Professional",
+      goals: ["Energy & Focus", "Weight Management"],
+      flags: ["Gut / Acidity / IBS"],
+      medicalNotes: "Chronic acidity (uses antacids occasionally).",
+      energyMorning: 4,
+      energyNoon: 3,
+      sleepQuality: 6
+    },
+    aharaDay: [
+      { time: "07:00", place: "Home", ahara: "Black Coffee (empty stomach)", vihara: "Getting ready", vichara: "Tired, needs a 'kick'", notes: "RED ZONE (Acidity; no breakfast)" },
+      { time: "08:30", place: "Home", ahara: "2 Toast + Butter", vihara: "Reading news", vichara: "", notes: "Light breakfast; low protein/fiber" },
+      { time: "10:45", place: "Office Pantry", ahara: "Tea (sugar) + 2 Parle-G biscuits", vihara: "Checking emails / socializing", vichara: "Bored, low energy", notes: "RED ZONE (first sugar+caffeine spike)" },
+      { time: "13:30", place: "Office Canteen", ahara: "Rice + Dal + Veg Curry", vihara: "With colleagues", vichara: "Full, slightly sleepy", notes: "Standard high-carb lunch" },
+      { time: "15:30", place: "Office Desk", ahara: "Coffee (sugar) + packet of chips", vihara: "Desk work", vichara: "Slump, needs energy boost", notes: "RED ZONE (post-lunch crash + junk)" },
+      { time: "17:00", place: "Office Pantry", ahara: "Tea (sugar) + 2 cream crackers", vihara: "Social break", vichara: "Mentally drained", notes: "RED ZONE (extra caffeine)" },
+      { time: "19:00", place: "Home", ahara: "Tea (sugar) + 2 samosas", vihara: "Relaxing after work", vichara: "Stressed, craving comfort", notes: "RED ZONE (deep fried + evening caffeine)" },
+      { time: "21:00", place: "Home", ahara: "2 Rotis + Sabzi + Curd", vihara: "With family", vichara: "Content", notes: "Reasonably balanced dinner" },
+      { time: "23:00", place: "Home / Couch", ahara: "Coffee (sugar)", vihara: "TV / mobile scrolling", vichara: "Relaxed but stimulated", notes: "RED ZONE (late caffeine, sleep disruptor)" }
+    ],
+    habitomeLoops: [
+      { type: "Rogi", cue: "11:00 AM: Mid-morning focus loss/boredom.", routine: "Goes to pantry, has Tea + Biscuits.", reward: "Temporary alertness, sugar rush.", tag: "Morning Tea Loop" },
+      { type: "Rogi", cue: "3:30 PM: Post-lunch sleepiness.", routine: "Buys Coffee + packet of chips.", reward: "Quick energy, crunch and taste.", tag: "Afternoon Crash Loop" },
+      { type: "Rogi", cue: "7:00 PM: Reaches home exhausted.", routine: "Orders Tea + Samosas from nearby shop.", reward: "Comfort, emotional reward.", tag: "Evening Junk Loop" },
+      { type: "Yogi", cue: "7:30 AM: Wakes up and feels thirsty.", routine: "Drinks 1 glass of water (when remembered).", reward: "Hydrated, clean feeling.", tag: "Morning Hydration (Yogi seed)" }
+    ],
+    smartSwaps: [
+      {
+        domain: "Morning / Breakfast",
+        oldHabit: "Black Coffee (empty stomach) as first intake.",
+        newSwap: "1 glass water + 5 soaked almonds on waking. Black coffee only after small breakfast (poha/idli/oats) within 1 hour.",
+        why: "Protects stomach lining, reduces acidity, provides slow-release energy and satiety.",
+        confidence: 8
+      },
+      {
+        domain: "Work-time Snack",
+        oldHabit: "10:45 AM Tea (sugar) + biscuits for boredom and energy.",
+        newSwap: "10:45 AM: Herbal tea / warm water + 1 fruit (apple/banana) + 1 boiled egg or handful chana.",
+        why: "Breaks sugar+caffeine dependence, stabilises blood glucose, adds fiber and protein.",
+        confidence: 7
+      },
+      {
+        domain: "Evening / Tea",
+        oldHabit: "7:00 PM Tea (sugar) + samosas.",
+        newSwap: "Switch to 7:00 PM chana chaat or roasted makhana on weekdays; keep samosas only 1 day/week as planned treat.",
+        why: "Cuts deep-fried fat load on most days and reduces evening reflux risk.",
+        confidence: 6
+      },
+      {
+        domain: "Night Craving / Screen",
+        oldHabit: "11:00 PM coffee with sugar while scrolling.",
+        newSwap: "Warm turmeric or cinnamon milk at 9:30 PM; no caffeine and screens after 10 PM (phone parked away from bed).",
+        why: "Improves sleep onset, reduces stimulation and late-night overthinking.",
+        confidence: 7
+      }
+    ],
+    tracking: {
+      duration: "14 days",
+      metric1: "Energy at 4:00 PM (1–10)",
+      metric2: "Days without any chips/packaged snacks"
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const aharaBody = document.getElementById("aharaBody");
+    const loopsBody = document.getElementById("loopsBody");
+    const swapsBody = document.getElementById("swapsBody");
+    const previewArea = document.getElementById("previewArea");
+    const formContainer = document.getElementById("formContainer");
+    const reportPage = document.getElementById("reportPage");
+    const reportPageContainer = reportPage.querySelector(".report-page-container");
+    const headerTitleEl = document.getElementById("headerTitle");
+
+    const elements = {
+      generateSummaryBtn: document.getElementById("generateSummaryBtn"),
+      viewReportBtn: document.getElementById("viewReportBtn"),
+      backToFormBtn: document.getElementById("backToFormBtn"),
+      downloadPdfBtn: document.getElementById("downloadPdfBtn"),
+      resetFormBtn: document.getElementById("resetFormBtn"),
+      copySummaryBtn: document.getElementById("copySummaryBtn"),
+      addAharaRowBtn: document.getElementById("addAharaRowBtn"),
+      addLoopBtn: document.getElementById("addLoopBtn"),
+      addSwapBtn: document.getElementById("addSwapBtn")
+    };
+
+    /* --- Slider label updater ---------------------------------------- */
+    function updateSliderLabel(slider) {
+      const valueLabel = document.querySelector('.slider-value[data-for="' + slider.id + '"]');
+      if (valueLabel) {
+        valueLabel.textContent = slider.value;
+      }
+    }
+
+    document.querySelectorAll('input[type="range"]').forEach(function (slider) {
+      slider.addEventListener("input", function () {
+        updateSliderLabel(this);
+      });
+      updateSliderLabel(slider);
+    });
+
+    /* --- Row creators ------------------------------------------------- */
+    function createAharaRow(data) {
+      const row = data || {};
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><input type="time" data-field="time" value="${row.time || ""}"></td>
+        <td><input type="text" data-field="place" placeholder="Home / Office / Canteen..." value="${row.place || ""}"></td>
+        <td><textarea data-field="ahara" rows="1" placeholder="Tea + biscuits, idli + chutney, rice + sambar...">${row.ahara || ""}</textarea></td>
+        <td><input type="text" data-field="vihara" placeholder="Working, scrolling mobile, with family..." value="${row.vihara || ""}"></td>
+        <td><input type="text" data-field="vichara" placeholder="Stressed, bored, relaxed..." value="${row.vichara || ""}"></td>
+        <td><input type="text" data-field="notes" placeholder="Late, heavy, skipped, RED ZONE..." value="${row.notes || ""}"></td>
+      `;
+      aharaBody.appendChild(tr);
+    }
+
+    function createLoopRow(data) {
+      const row = data || {};
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>
+          <select data-field="loopType">
+            <option value="">Select</option>
+            <option ${row.type === "Rogi" ? "selected" : ""}>Rogi</option>
+            <option ${row.type === "Bhogi" ? "selected" : ""}>Bhogi</option>
+            <option ${row.type === "Yogi" ? "selected" : ""}>Yogi</option>
+          </select>
+        </td>
+        <td><textarea data-field="cue" rows="1" placeholder="What happens before? (4:30 pm tired, 11 pm scrolling...)">${row.cue || ""}</textarea></td>
+        <td><textarea data-field="routine" rows="1" placeholder="What do they actually do? (Tea + 4 biscuits...)">${row.routine || ""}</textarea></td>
+        <td><textarea data-field="reward" rows="1" placeholder="What feeling/result? (Comfort, escape, heaviness...)">${row.reward || ""}</textarea></td>
+        <td><input type="text" data-field="tag" placeholder="Tea loop, night snacking, etc." value="${row.tag || ""}"></td>
+      `;
+      loopsBody.appendChild(tr);
+    }
+
+    function createSwapRow(data, index) {
+      const row = data || {};
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${index}</td>
+        <td>
+          <select data-field="domain">
+            <option value="">Select</option>
+            <option ${row.domain === "Morning / Breakfast" ? "selected" : ""}>Morning / Breakfast</option>
+            <option ${row.domain === "Work-time Snack" ? "selected" : ""}>Work-time Snack</option>
+            <option ${row.domain === "Evening / Tea" ? "selected" : ""}>Evening / Tea</option>
+            <option ${row.domain === "Dinner / ELD" ? "selected" : ""}>Dinner / ELD</option>
+            <option ${row.domain === "Night Craving / Screen" ? "selected" : ""}>Night Craving / Screen</option>
+            <option ${row.domain === "Weekend / Social" ? "selected" : ""}>Weekend / Social</option>
+          </select>
+        </td>
+        <td><textarea data-field="oldHabit" rows="1" placeholder="e.g. Skip breakfast, tea + biscuits, heavy rice at 9:45 pm">${row.oldHabit || ""}</textarea></td>
+        <td><textarea data-field="newSwap" rows="1" placeholder="e.g. Fruit + nuts instead of biscuits, herbal drink instead of tea #5">${row.newSwap || ""}</textarea></td>
+        <td><textarea data-field="why" rows="1" placeholder="Stabilises sugar, reduces cravings, supports sleep, etc.">${row.why || ""}</textarea></td>
+        <td><input type="number" min="0" max="10" data-field="confidence" placeholder="7" style="width:52px;" value="${row.confidence || ""}"></td>
+      `;
+      swapsBody.appendChild(tr);
+    }
+
+    function initRows(data) {
+      aharaBody.innerHTML = "";
+      loopsBody.innerHTML = "";
+      swapsBody.innerHTML = "";
+      (data.aharaDay || []).forEach(createAharaRow);
+      (data.habitomeLoops || []).forEach(createLoopRow);
+      (data.smartSwaps || []).forEach(function (swap, idx) {
+        createSwapRow(swap, idx + 1);
+      });
+    }
+
+    /* --- Prefill Priya’s data ---------------------------------------- */
+    function prefillForm(data) {
+      const snap = data.snapshot;
+
+      document.getElementById("clientName").value = snap.clientName || "";
+      document.getElementById("clientAge").value = snap.clientAge || "";
+      document.getElementById("clientRole").value = snap.clientRole || "";
+      document.getElementById("medicalNotes").value = snap.medicalNotes || "";
+      headerTitleEl.textContent = (snap.clientName || "Client") + "'s Y-Diet Habitome Consult";
+
+      document.querySelectorAll('input[name="goal"]').forEach(function (el) {
+        el.checked = (snap.goals || []).includes(el.value);
+      });
+
+      document.querySelectorAll('input[name="flag"]').forEach(function (el) {
+        el.checked = (snap.flags || []).includes(el.value);
+      });
+
+      const energyMorningEl = document.getElementById("energyMorning");
+      const energyNoonEl = document.getElementById("energyNoon");
+      const sleepQualityEl = document.getElementById("sleepQuality");
+
+      energyMorningEl.value = snap.energyMorning || 5;
+      energyNoonEl.value = snap.energyNoon || 5;
+      sleepQualityEl.value = snap.sleepQuality || 5;
+
+      updateSliderLabel(energyMorningEl);
+      updateSliderLabel(energyNoonEl);
+      updateSliderLabel(sleepQualityEl);
+
+      document.getElementById("trackingDuration").value = data.tracking.duration;
+      document.getElementById("metric1").value = data.tracking.metric1;
+      document.getElementById("metric2").value = data.tracking.metric2;
+
+      initRows(data);
+    }
+
+    /* --- Helpers ------------------------------------------------------ */
+    function getCheckedValues(name) {
+      return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked')).map(function (el) {
+        return el.value;
+      });
+    }
+
+    function collectTableData(tableBody, fields) {
+      const rows = [];
+      tableBody.querySelectorAll("tr").forEach(function (tr, idx) {
+        const row = {};
+        let hasContent = false;
+
+        fields.forEach(function (field) {
+          const el = tr.querySelector('[data-field="' + field + '"]');
+          if (!el) {
+            row[field] = "";
+            return;
+          }
+          let value = el.value != null ? el.value.trim() : "";
+          if (field === "confidence" && value !== "") {
+            value = parseInt(value, 10);
+          }
+          row[field] = value;
+          if (value !== "") hasContent = true;
+        });
+
+        if (tableBody.id === "swapsBody") {
+          row.index = idx + 1;
+        }
+
+        if (hasContent) rows.push(row);
+      });
+      return rows;
+    }
+
+    function collectFormData() {
+      const aharaFields = ["time", "place", "ahara", "vihara", "vichara", "notes"];
+      const loopFields = ["loopType", "cue", "routine", "reward", "tag"];
+      const swapFields = ["domain", "oldHabit", "newSwap", "why", "confidence"];
+
+      return {
+        meta: {
+          generatedAt: new Date().toISOString()
+        },
+        snapshot: {
+          name: (document.getElementById("clientName").value || "Client").trim(),
+          age: document.getElementById("clientAge").value || "N/A",
+          role: document.getElementById("clientRole").value || "N/A",
+          goals: getCheckedValues("goal"),
+          medicalFlags: getCheckedValues("flag"),
+          medicalNotes: document.getElementById("medicalNotes").value.trim() || "None",
+          scales: {
+            energyMorning: parseInt(document.getElementById("energyMorning").value, 10),
+            energyNoon: parseInt(document.getElementById("energyNoon").value, 10),
+            sleepQuality: parseInt(document.getElementById("sleepQuality").value, 10)
+          }
+        },
+        aharaDay: collectTableData(aharaBody, aharaFields),
+        habitomeLoops: collectTableData(loopsBody, loopFields),
+        smartSwaps: collectTableData(swapsBody, swapFields),
+        tracking: {
+          duration: document.getElementById("trackingDuration").value,
+          metric1: document.getElementById("metric1").value.trim() || "N/A",
+          metric2: document.getElementById("metric2").value.trim() || "N/A"
+        }
+      };
+    }
+
+    /* --- Report HTML generator ---------------------------------------- */
+    function generateReportHTML(data) {
+      const snapshot = data.snapshot;
+      const aharaDay = data.aharaDay;
+      const loops = data.habitomeLoops;
+      const swaps = data.smartSwaps;
+      const tracking = data.tracking;
+
+      const goalsText = snapshot.goals && snapshot.goals.length
+        ? snapshot.goals.join(" & ")
+        : "No goals selected";
+
+      const medFlags = snapshot.medicalFlags || [];
+      const medBox = medFlags.length
+        ? `
+          <div class="highlight-box">
+            <strong>Medical Flags:</strong> ${medFlags.join(", ")}<br>
+            Notes: ${snapshot.medicalNotes}
+          </div>
+        `
+        : "";
+
+      const aharaRows = aharaDay.map(function (row) {
+        const isRed = (row.notes || "").toUpperCase().includes("RED ZONE");
+        const style = isRed ? 'style="background-color: var(--risk-soft);"' : "";
+        return `
+          <tr ${style}>
+            <td>${row.time || ""}</td>
+            <td>${row.ahara || ""}</td>
+            <td>${row.vihara || ""}</td>
+            <td>${row.vichara || ""}</td>
+            <td>${row.notes || ""}</td>
+          </tr>
+        `;
+      }).join("");
+
+      const loopRows = loops.map(function (row) {
+        const t = row.loopType || "";
+        const style = t === "Rogi"
+          ? 'style="background-color: #fffbeb;"'
+          : "";
+        return `
+          <tr ${style}>
+            <td><strong>${t}</strong></td>
+            <td>${row.cue || ""}</td>
+            <td>${row.routine || ""}</td>
+            <td>${row.reward || ""}</td>
+            <td>${row.tag || ""}</td>
+          </tr>
+        `;
+      }).join("");
+
+      const swapsRows = swaps.map(function (row) {
+        return `
+          <tr>
+            <td>${row.index || ""}</td>
+            <td>${row.oldHabit || ""} <br><span style="font-size:11px;color:#6b7280;">(${row.domain || ""})</span></td>
+            <td><strong>${row.newSwap || ""}</strong></td>
+            <td>${row.why || ""}</td>
+            <td>${row.confidence !== "" ? row.confidence + "/10" : ""}</td>
+          </tr>
+        `;
+      }).join("");
+
+      return `
+        <div class="report-header">
+          <div class="report-title">Personalised Habitome Report</div>
+          <div class="report-subtitle">
+            Client: ${snapshot.name} (${snapshot.age} yrs, ${snapshot.role}) · Generated: ${new Date().toLocaleDateString()}
+          </div>
+        </div>
+
+        <div class="report-section">
+          <div class="section-title">1. Baseline & Goals</div>
+          <div class="stat-grid">
+            <div class="stat-card">
+              Goals
+              <div class="stat-value" style="font-size:14px;">${goalsText}</div>
+            </div>
+            <div class="stat-card">
+              Energy (Morning)
+              <div class="stat-value">${snapshot.scales.energyMorning}/10</div>
+            </div>
+            <div class="stat-card">
+              Energy (Post-lunch)
+              <div class="stat-value">${snapshot.scales.energyNoon}/10</div>
+            </div>
+            <div class="stat-card">
+              Sleep Quality
+              <div class="stat-value">${snapshot.scales.sleepQuality}/10</div>
+            </div>
+          </div>
+          ${medBox}
+        </div>
+
+        <div class="report-section">
+          <div class="section-title">2. 24h Habit Mapping (Ahara–Vihara–Vichara)</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">
+            A one-day map of food, activity and feeling. RED ZONE rows show high-risk caffeine, sugar and timing combinations.
+          </p>
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Food / Drink</th>
+                <th>Activity (Vihara)</th>
+                <th>Feeling (Vichara)</th>
+                <th>Red Zone Notes</th>
+              </tr>
+            </thead>
+            <tbody>${aharaRows}</tbody>
+          </table>
+        </div>
+
+        <div class="report-section">
+          <div class="section-title">3. Core Habitome Loops (Rogi / Yogi)</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">
+            Each loop is mapped as: Cue → Routine → Reward. Rogi loops are priority for Smart Swaps.
+          </p>
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Cue (Trigger)</th>
+                <th>Routine (Action)</th>
+                <th>Reward (Result)</th>
+                <th>Tag</th>
+              </tr>
+            </thead>
+            <tbody>${loopRows}</tbody>
+          </table>
+        </div>
+
+        <div class="report-section">
+          <div class="section-title">4. Smart Swap Prescription (Action Plan)</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">
+            Focus on these ${swaps.length} swaps for the next ${tracking.duration}. Confidence scores guide what to start with first.
+          </p>
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Old Habit</th>
+                <th>New Smart Swap</th>
+                <th>Why</th>
+                <th>Confidence</th>
+              </tr>
+            </thead>
+            <tbody>${swapsRows}</tbody>
+          </table>
+        </div>
+
+        <div class="report-section" style="border-bottom:1px solid #e5e7eb;">
+          <div class="section-title">5. Tracking & Next Steps</div>
+          <div class="stat-grid">
+            <div class="stat-card">
+              Duration
+              <div class="stat-value" style="font-size:15px;">${tracking.duration}</div>
+            </div>
+            <div class="stat-card">
+              Metric 1 (Key KPI)
+              <div style="font-size:13px;font-weight:600;color:#111827;margin-top:4px;">
+                ${tracking.metric1}
+              </div>
+            </div>
+            <div class="stat-card">
+              Metric 2 (Habit KPI)
+              <div style="font-size:13px;font-weight:600;color:#111827;margin-top:4px;">
+                ${tracking.metric2}
+              </div>
+            </div>
+          </div>
+          <p style="font-size:12px;color:var(--muted);margin-top:10px;">
+            <strong>Disclaimer:</strong> This is a habit and nutrition consultation report and is not a substitute for medical care.
+            Any change in medication or medical management should be done with your doctor.
+          </p>
+        </div>
+      `;
+    }
+
+    /* --- Button Handlers ---------------------------------------------- */
+
+    // Generate JSON Summary
+    elements.generateSummaryBtn.addEventListener("click", function () {
+      const data = collectFormData();
+      previewArea.textContent = JSON.stringify(data, null, 2);
+    });
+
+    // View Report
+    elements.viewReportBtn.addEventListener("click", function () {
+      const data = collectFormData();
+      if (!data.smartSwaps.length) {
+        alert("Please fill in at least one Smart Swap before generating the report.");
+        return;
+      }
+      reportPageContainer.innerHTML = generateReportHTML(data);
+      formContainer.style.display = "none";
+      reportPage.style.display = "block";
+      window.scrollTo(0, 0);
+    });
+
+    // Back to Form
+    elements.backToFormBtn.addEventListener("click", function () {
+      reportPage.style.display = "none";
+      formContainer.style.display = "grid";
+      window.scrollTo(0, 0);
+    });
+
+    // Download / Print PDF
+    elements.downloadPdfBtn.addEventListener("click", function () {
+      window.print();
+    });
+
+    // Copy JSON Summary
+    elements.copySummaryBtn.addEventListener("click", function () {
+      const text = previewArea.textContent.trim();
+      if (!text) {
+        alert("Nothing to copy. Please click 'Generate JSON Summary' first.");
+        return;
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          elements.copySummaryBtn.textContent = "✓ Copied!";
+          setTimeout(function () {
+            elements.copySummaryBtn.innerHTML = '<span class="btn-icon">📋</span> Copy Summary';
+          }, 1500);
+        });
+      } else {
+        alert("Clipboard not available. Please select and copy manually.");
+      }
+    });
+
+    // Add dynamic rows
+    elements.addAharaRowBtn.addEventListener("click", function () {
+      createAharaRow({});
+    });
+
+    elements.addLoopBtn.addEventListener("click", function () {
+      createLoopRow({});
+    });
+
+    elements.addSwapBtn.addEventListener("click", function () {
+      const count = swapsBody.querySelectorAll("tr").length;
+      createSwapRow({}, count + 1);
+    });
+
+    // Reset to Priya case
+    elements.resetFormBtn.addEventListener("click", function () {
+      if (!confirm("Reset everything back to Priya's pre-filled case?")) return;
+      document.getElementById("consultForm").reset();
+      document.querySelectorAll('input[type="range"]').forEach(updateSliderLabel);
+      prefillForm(PRIYA_DATA);
+      previewArea.textContent = "";
+    });
+
+    // Live update header with name
+    document.getElementById("clientName").addEventListener("input", function () {
+      const name = this.value.trim() || "Client";
+      headerTitleEl.textContent = name + "'s Y-Diet Habitome Consult";
+    });
+
+    // Initial load: Priya case
+    prefillForm(PRIYA_DATA);
+  });
+</script>
+</body>
+</html>
+
